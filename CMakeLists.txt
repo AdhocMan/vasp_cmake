@@ -26,9 +26,6 @@ if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
 		)
 endif()
 
-# set language and standard
-set(CMAKE_CXX_STANDARD 14)
-
 # set binary directory
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
@@ -64,9 +61,10 @@ option(VASP_DFTD4 "Enable DFTD4 library" OFF)
 option(VASP_WANNIER90 "Enable Wannier90 library" OFF)
 option(VASP_LIBXC "Enable Libxc library" OFF)
 option(VASP_CUDA "Enable cuda accelaration" OFF)
+set(VASP_CUDA_VERSION "Default" CACHE STRING "Set the CUDA version passed on to the NVHPC compiler")
 cmake_dependent_option(VASP_NCCLP2P "Enable NCCL library collectives instead of MPI" ON "VASP_CUDA" OFF)
 
-set(CMAKE_CUDA_ARCHITECTURES "60;70;80" CACHE STRING "Cuda architectures")
+set(CMAKE_CUDA_ARCHITECTURES "native" CACHE STRING "Cuda architectures list or native for automatic detection. Example: \"60;70;80\"")
 
 set(VASP_EXTERNAL_LIBS)
 set(VASP_FORTRAN_FLAGS)
@@ -92,6 +90,7 @@ set(VASP_DEFINITIONS
 	$<$<BOOL:${VASP_HDF5}>:VASP_HDF5>
 	$<$<BOOL:${VASP_LIBXC}>:USELIBXC>
 	$<$<BOOL:${VASP_WANNIER90}>:VASP2WANNIER90>
+	# nvhpc already defines _OPENACC with "-acc", but not defining it seems to cause issues with dependency detection with make. Ninja works without it.
 	$<$<BOOL:${VASP_CUDA}>:_OPENACC>
 	$<$<BOOL:${VASP_CUDA}>:USENCCL>
 	$<$<BOOL:${VASP_NCCLP2P}>:USENCCLP2P>
@@ -161,6 +160,10 @@ if(VASP_CUDA)
 		set(VASP_GPU_FLAG "${VASP_GPU_FLAG},cc${arch}")
 	endforeach()
 
+	if(VASP_CUDA_VERSION AND NOT ${VASP_CUDA_VERSION} STREQUAL "Default")
+		set(VASP_GPU_FLAG "${VASP_GPU_FLAG},cuda${VASP_CUDA_VERSION}")
+	endif()
+
 	list(APPEND VASP_FORTRAN_FLAGS -acc ${VASP_GPU_FLAG})
 	list(APPEND VASP_EXTERNAL_LIBS "-cudalib=cublas,cusolver,cufft,nccl -cuda -acc ${VASP_GPU_FLAG}")
 endif()
@@ -174,7 +177,7 @@ elseif(CMAKE_Fortran_COMPILER_ID STREQUAL "NVHPC")
 	find_package(QD MODULE REQUIRED)
 	list(APPEND VASP_EXTERNAL_LIBS QD::qd)
 	list(APPEND VASP_DEFINITIONS qd_emulate)
-	list(APPEND VASP_FORTRAN_FLAGS -Mbackslash -Mlarge_arrays -Mextend)
+	list(APPEND VASP_FORTRAN_FLAGS -Mbackslash -Mlarge_arrays -Mextend -Minform=severe)
 endif()
 
 
