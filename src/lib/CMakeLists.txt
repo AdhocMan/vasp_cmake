@@ -1,22 +1,9 @@
-
-if(CMAKE_Fortran_COMPILER_ID STREQUAL "GNU")
-	set(LINPACK_FORTRAN_FLAGS)
-elseif(CMAKE_Fortran_COMPILER_ID STREQUAL "NVHPC")
-	set(LINPACK_FORTRAN_FLAGS -Mfixed)
-endif()
-
 add_library(linpack_objects OBJECT
 	linpack_double.f
 	)
 
-target_compile_options(linpack_objects PRIVATE $<$<COMPILE_LANGUAGE:Fortran>:${LINPACK_FORTRAN_FLAGS}>)
-
-if(CMAKE_Fortran_COMPILER_ID STREQUAL "GNU")
-	set(LIB_FORTRAN_FLAGS -ffree-form -ffree-line-length-none)
-elseif(CMAKE_Fortran_COMPILER_ID STREQUAL "NVHPC")
-	set(LIB_FORTRAN_FLAGS -Mfixed -Mfree)
-endif()
-
+target_compile_options(linpack_objects PRIVATE $<$<COMPILE_LANGUAGE:Fortran>:${VASP_LINPACK_FORTRAN_FLAGS}>)
+set_target_properties(linpack_objects PROPERTIES Fortran_FORMAT FIXED)
 
 add_library(lib_objects OBJECT
 	preclib.F
@@ -29,4 +16,5 @@ add_library(lib_objects OBJECT
 	)
 
 target_link_libraries(lib_objects PRIVATE ${VASP_EXTERNAL_LIBS} linpack_objects)
-target_compile_options(lib_objects PRIVATE $<$<COMPILE_LANGUAGE:Fortran>:${LIB_FORTRAN_FLAGS}>)
+set_target_properties(lib_objects PROPERTIES Fortran_FORMAT FREE)
+target_compile_options(lib_objects PRIVATE $<$<COMPILE_LANGUAGE:Fortran>:${VASP_LIB_FORTRAN_FLAGS}>)

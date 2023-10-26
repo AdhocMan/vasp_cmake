@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.20 FATAL_ERROR)
 set(CMAKE_POLICY_DEFAULT_CMP0048 NEW)
 
 project(vasp
-    VERSION 4.2.3
+    VERSION 6.3.0
     DESCRIPTION "VASP"
     LANGUAGES Fortran C CXX)
 
@@ -55,8 +55,8 @@ option(VASP_SHMEM_RPROJ "Enable shared memory for PAW projections" OFF)
 option(VASP_SYSV "Enable shared-memory for ipcs and system-V" OFF)
 option(VASP_BSE "Enable BSE method" ON)
 
-option(VASP_OPENMP "Enable ScaLAPACK" OFF)
-option(VASP_FFTLIB "Enable internal FFTLIB" ON)
+option(VASP_OPENMP "Enable OpenMP" OFF)
+cmake_dependent_option(VASP_FFTLIB "Enable internal FFTLIB" ON "VASP_OPENMP" OFF)
 option(VASP_SCALAPACK "Enable ScaLAPACK" OFF)
 option(VASP_HDF5 "Enable hdf5" OFF)
 option(VASP_LIBBEEF "Enable libbeef for van-der-Waals functionals" OFF)
@@ -68,83 +68,57 @@ cmake_dependent_option(VASP_NCCLP2P "Enable NCCL library collectives instead of 
 
 set(CMAKE_CUDA_ARCHITECTURES "60;70;80" CACHE STRING "Cuda architectures")
 
-set(VASP_DEFINITIONS MPI "HOST=\"${VASP_HOST_NAME}\"" MPI_BLOCK=${VASP_MPI_BLOCK})
 set(VASP_EXTERNAL_LIBS)
 set(VASP_FORTRAN_FLAGS)
 
 
-if(VASP_PROFILING)
-    list(APPEND VASP_DEFINITIONS PROFILING)
-endif()
-
-if(VASP_COLLECTIVE)
-    list(APPEND VASP_DEFINITIONS use_collective)
-endif()
-
-if(VASP_AVOIDALLOC)
-    list(APPEND VASP_DEFINITIONS avoidalloc)
-endif()
-
-if(VASP_VASP6)
-    list(APPEND VASP_DEFINITIONS vasp6)
-endif()
-
-if(VASP_TBDYN)
-    list(APPEND VASP_DEFINITIONS tbdyn)
-endif()
-
-if(VASP_FOCK_DBLBUF)
-    list(APPEND VASP_DEFINITIONS fock_dblbuf)
-endif()
-
-if(VASP_SHMEM)
-    list(APPEND VASP_DEFINITIONS use_shmem)
-endif()
-
-if(VASP_SHMEM_BCAST)
-    list(APPEND VASP_DEFINITIONS shmem_bcast_buffer)
-endif()
-
-if(VASP_SHMEM_RPROJ)
-    list(APPEND VASP_DEFINITIONS shmem_rproj)
-endif()
-
-if(VASP_SYSV)
-    list(APPEND VASP_DEFINITIONS sysv)
-endif()
-
-if(VASP_BSE)
-    list(APPEND VASP_DEFINITIONS use_bse_te)
-endif()
-
+set(VASP_DEFINITIONS
+	MPI
+	"HOST=\"${VASP_HOST_NAME}\""
+	MPI_BLOCK=${VASP_MPI_BLOCK}
+	$<$<BOOL:${VASP_PROFILING}>:PROFILING>
+	$<$<BOOL:${VASP_COLLECTIVE}>:use_collective>
+	$<$<BOOL:${VASP_AVOIDALLOC}>:avoidalloc>
+	$<$<BOOL:${VASP_VASP6}>:vasp6>
+	$<$<BOOL:${VASP_TBDYN}>:tbdyn>
+	$<$<BOOL:${VASP_FOCK_DBLBUF}>:fock_dblbuf>
+	$<$<BOOL:${VASP_SHMEM}>:use_shmem>
+	$<$<BOOL:${VASP_SHMEM_BCAST}>:shmem_bcast_buffer>
+	$<$<BOOL:${VASP_SHMEM_RPROJ}>:shmem_rproj>
+	$<$<BOOL:${VASP_SYSV}>:sysv>
+	$<$<BOOL:${VASP_BSE}>:use_bse_te>
+	$<$<BOOL:${VASP_OPENMP}>:_OPENMP>
+	$<$<BOOL:${VASP_SCALAPACK}>:scaLAPACK>
+	$<$<BOOL:${VASP_HDF5}>:VASP_HDF5>
+	$<$<BOOL:${VASP_LIBXC}>:USELIBXC>
+	$<$<BOOL:${VASP_WANNIER90}>:VASP2WANNIER90>
+	$<$<BOOL:${VASP_CUDA}>:_OPENACC>
+	$<$<BOOL:${VASP_CUDA}>:USENCCL>
+	$<$<BOOL:${VASP_NCCLP2P}>:USENCCLP2P>
+	)
 
 if(VASP_OPENMP)
-    list(APPEND VASP_DEFINITIONS _OPENMP)
-	find_package(OpenMP COMPONENTS Fortran CXX REQUIRED)
+	find_package(OpenMP MODULE COMPONENTS Fortran CXX REQUIRED)
     list(APPEND VASP_EXTERNAL_LIBS OpenMP::OpenMP_Fortran OpenMP::OpenMP_CXX)
 endif()
 
 if(VASP_SCALAPACK)
-    list(APPEND VASP_DEFINITIONS scaLAPACK)
-    find_package(SCALAPACK REQUIRED)
+	find_package(SCALAPACK MODULE REQUIRED)
     list(APPEND VASP_EXTERNAL_LIBS SCALAPACK::SCALAPACK)
 endif()
 
 if(VASP_HDF5)
-    list(APPEND VASP_DEFINITIONS VASP_HDF5)
-    find_package(HDF5 COMPONENTS Fortran REQUIRED)
+	find_package(HDF5 MODULE COMPONENTS Fortran REQUIRED)
     list(APPEND VASP_EXTERNAL_LIBS hdf5::hdf5_fortran)
 endif()
 
 if(VASP_LIBXC)
-    list(APPEND VASP_DEFINITIONS USELIBXC)
-	find_package(LibXC REQUIRED)
+	find_package(LibXC MODULE REQUIRED)
     list(APPEND VASP_EXTERNAL_LIBS LibXC::libxc)
 endif()
 
 if(VASP_WANNIER90)
-    list(APPEND VASP_DEFINITIONS VASP2WANNIER90)
-	find_package(WANNIER90 REQUIRED)
+	find_package(WANNIER90 MODULE REQUIRED)
 	list(APPEND VASP_EXTERNAL_LIBS WANNIER90::wannier90)
 endif()
 
@@ -154,24 +128,23 @@ if(VASP_LIBBEEF OR VASP_DFTD4)
 endif()
 
 
-find_package(MPI COMPONENTS Fortran)
+find_package(MPI MODULE COMPONENTS Fortran)
 list(APPEND VASP_EXTERNAL_LIBS MPI::MPI_Fortran)
 
-find_package(BLAS REQUIRED)
+set(BLA_SIZEOF_INTEGER 4) # only look for 32-bit BLAS / LAPACK
+find_package(BLAS MODULE REQUIRED)
 list(APPEND VASP_EXTERNAL_LIBS BLAS::BLAS)
 
-find_package(LAPACK REQUIRED)
+find_package(LAPACK MODULE REQUIRED)
 list(APPEND VASP_EXTERNAL_LIBS LAPACK::LAPACK)
 
-
-set(BLA_FFTW_PROVIDERS Arm Arm_mp)
-if(NOT BLA_VENDOR OR NOT BLA_VENDOR IN_LIST BLA_FFTW_PROVIDERS)
-	find_package(FFTW)
-	list(APPEND VASP_EXTERNAL_LIBS FFTW::FFTW)
-	if(VASP_OPENMP)
-		find_package(FFTWOMP)
-		list(APPEND VASP_EXTERNAL_LIBS FFTWOMP::FFTWOMP)
-	endif()
+# The FindFFTW module will use the blas library if it provides FFTW symbols like MKL or ArmPL
+if(VASP_OPENMP)
+	find_package(FFTW MODULE REQUIRED COMPONENTS OMP)
+	list(APPEND VASP_EXTERNAL_LIBS FFTW::FFTW_OMP)
+else()
+	find_package(FFTW MODULE REQUIRED COMPONENTS SERIAL)
+	list(APPEND VASP_EXTERNAL_LIBS FFTW::FFTW_SERIAL)
 endif()
 
 
@@ -179,13 +152,6 @@ if(VASP_CUDA)
 	if(NOT CMAKE_Fortran_COMPILER_ID STREQUAL "NVHPC")
 		message(FATAL_ERROR "CUDA accelaration requires NVHPC fortran compiler.")
 	endif()
-
-	list(APPEND VASP_DEFINITIONS _OPENACC USENCCL qd_emulate)
-
-	if(VASP_NCCLP2P)
-		list(APPEND VASP_DEFINITIONS USENCCLP2P)
-	endif()
-
 
 	set(VASP_CUDA_ARCH ${CMAKE_CUDA_ARCHITECTURES})
 	list(POP_FRONT VASP_CUDA_ARCH VASP_FIRST_ARCH)
@@ -197,16 +163,18 @@ if(VASP_CUDA)
 
 	list(APPEND VASP_FORTRAN_FLAGS -acc ${VASP_GPU_FLAG})
 	list(APPEND VASP_EXTERNAL_LIBS "-cudalib=cublas,cusolver,cufft,nccl -cuda -acc ${VASP_GPU_FLAG}")
-
-	find_package(QD REQUIRED)
-	list(APPEND VASP_EXTERNAL_LIBS QD::qd)
 endif()
 
 
+# set compiler specific settings
+# note: free and fixed format flags are set through target properties
 if(CMAKE_Fortran_COMPILER_ID STREQUAL "GNU")
-	list(APPEND VASP_FORTRAN_FLAGS -ffree-form -ffree-line-length-none -w -ffpe-summary=invalid,zero,overflow -fallow-argument-mismatch)
+	list(APPEND VASP_FORTRAN_FLAGS -ffree-line-length-none -w -ffpe-summary=invalid,zero,overflow -fallow-argument-mismatch)
 elseif(CMAKE_Fortran_COMPILER_ID STREQUAL "NVHPC")
-	list(APPEND VASP_FORTRAN_FLAGS -Mfree -Mbackslash -Mlarge_arrays)
+	find_package(QD MODULE REQUIRED)
+	list(APPEND VASP_EXTERNAL_LIBS QD::qd)
+	list(APPEND VASP_DEFINITIONS qd_emulate)
+	list(APPEND VASP_FORTRAN_FLAGS -Mbackslash -Mlarge_arrays -Mextend)
 endif()
 
 

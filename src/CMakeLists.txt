@@ -5,42 +5,33 @@ function(vasp_create_executable name sources)
 	target_link_libraries(${name} PRIVATE linpack_objects lib_objects parser_objects ${VASP_EXTERNAL_LIBS})
 	set_target_properties(${name} PROPERTIES LINKER_LANGUAGE Fortran)
 	set_target_properties(${name} PROPERTIES Fortran_MODULE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/${name}_mod_files)
+	set_target_properties(${name} PROPERTIES Fortran_FORMAT FREE)
 	if(VASP_FFTLIB)
 		target_link_libraries(vasp_std PRIVATE fftlib_objects)
 	endif()
 endfunction()
 
 
-FILE(GLOB VASP_SOURCES *.F)
+file(READ ".objects" VASP_OBJECTS_CONTENT)
 
-# Remove from sources as needed
+string(REGEX MATCHALL "[a-zA-Z_0-9-]+\.o" VASP_OBJECTS ${VASP_OBJECTS_CONTENT})
+
+set(VASP_SOURCES)
+foreach(object IN LISTS VASP_OBJECTS)
+    string(REGEX REPLACE "\\.[^.]*$" "" file_name ${object})
+    list(APPEND VASP_SOURCES ${file_name}.F)
+endforeach()
+
+list(APPEND VASP_SOURCES fftmpiw.F fftmpi_map.F fftw3d.F fft3dlib.F main.F)
 list(REMOVE_ITEM VASP_SOURCES
-	${CMAKE_CURRENT_SOURCE_DIR}/mp2.F # outdated. Only required with scalapack, provided by ump2.F instead
-	${CMAKE_CURRENT_SOURCE_DIR}/zdotc.F
-	${CMAKE_CURRENT_SOURCE_DIR}/dgemmtest.F
-	${CMAKE_CURRENT_SOURCE_DIR}/zgemmtest.F
-	${CMAKE_CURRENT_SOURCE_DIR}/ffttest.F
-	${CMAKE_CURRENT_SOURCE_DIR}/fft3dessl+furth.F
-	${CMAKE_CURRENT_SOURCE_DIR}/fft3dcray.F
-	${CMAKE_CURRENT_SOURCE_DIR}/fft3dfujitsu.F
-	${CMAKE_CURRENT_SOURCE_DIR}/fft3dbatched.F
-	${CMAKE_CURRENT_SOURCE_DIR}/fft3dnec.F
-	${CMAKE_CURRENT_SOURCE_DIR}/fft3dessl.F
-	${CMAKE_CURRENT_SOURCE_DIR}/fft3dlib_f77.F
-	${CMAKE_CURRENT_SOURCE_DIR}/fft3dsimple.F
-	${CMAKE_CURRENT_SOURCE_DIR}/fft3dfurth_f77.F
-	${CMAKE_CURRENT_SOURCE_DIR}/fft3dfurth.F
-	${CMAKE_CURRENT_SOURCE_DIR}/fftw3d+furth.F
-	${CMAKE_CURRENT_SOURCE_DIR}/fftmpi.F
-	${CMAKE_CURRENT_SOURCE_DIR}/makeparam.F
+	wave_gpu.F # does not exist
 	)
-
 if(NOT VASP_CUDA)
 	list(REMOVE_ITEM VASP_SOURCES
-		${CMAKE_CURRENT_SOURCE_DIR}/openacc.F
+		openacc.F # issues when compiling without nvfortran. Not required without CUDA.
 		)
 endif()
-
+list(REMOVE_DUPLICATES VASP_SOURCES)
 
 if(VASP_FFTLIB)
 	add_subdirectory(fftlib)
