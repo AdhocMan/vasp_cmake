@@ -39,6 +39,7 @@ include(GNUInstallDirs)
 include(CMakeDependentOption)
 
 option(VASP_PROFILING "Enable profiling" OFF)
+set(VASP_CACHE_SIZE "4000" CACHE STRING "Cache size")
 option(VASP_COLLECTIVE "Enable MPI collectives" OFF)
 set(VASP_MPI_BLOCK "8000" CACHE STRING "MPI block size")
 set(VASP_HOST_NAME ${CMAKE_SYSTEM_NAME} CACHE STRING "Host system name")
@@ -74,6 +75,7 @@ set(VASP_DEFINITIONS
 	MPI
 	"HOST=\"${VASP_HOST_NAME}\""
 	MPI_BLOCK=${VASP_MPI_BLOCK}
+	CACHE_SIZE=${VASP_CACHE_SIZE}
 	$<$<BOOL:${VASP_PROFILING}>:PROFILING>
 	$<$<BOOL:${VASP_COLLECTIVE}>:use_collective>
 	$<$<BOOL:${VASP_AVOIDALLOC}>:avoidalloc>
