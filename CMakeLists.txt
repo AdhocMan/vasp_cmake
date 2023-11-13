@@ -129,7 +129,7 @@ if(VASP_LIBBEEF OR VASP_DFTD4)
 endif()
 
 
-find_package(MPI MODULE COMPONENTS Fortran)
+find_package(MPI MODULE REQUIRED COMPONENTS Fortran)
 list(APPEND VASP_EXTERNAL_LIBS MPI::MPI_Fortran)
 
 set(BLA_SIZEOF_INTEGER 4) # only look for 32-bit BLAS / LAPACK
