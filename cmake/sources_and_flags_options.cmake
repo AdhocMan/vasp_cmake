@@ -9,7 +9,6 @@ set(_VASP_SOURCES_O2)
 set(_VASP_SOURCES_O3)
 set(_VASP_SOURCES_IN)
 
-set(VASP_FORTRAN_FLAGS)
 
 file(READ "${PROJECT_SOURCE_DIR}/src/.objects" VASP_OBJECTS_CONTENT)
 
@@ -43,6 +42,7 @@ set(_VASP_SOURCES "fftmpiw.F;fftmpi_map.F;fftw3d.F;fft3dlib.F")
 # Languages must be enabled to check compiler id
 enable_language(C CXX Fortran)
 
+set(VASP_FORTRAN_FLAGS)
 # note: free and fixed format flags are set through target properties
 if(CMAKE_Fortran_COMPILER_ID STREQUAL "GNU")
 	list(APPEND VASP_FORTRAN_FLAGS -ffree-line-length-none -w -ffpe-summary=invalid,zero,overflow -fallow-argument-mismatch)
