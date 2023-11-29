@@ -4,6 +4,7 @@ macro(set_mode_flags languages mode value)
 	endforeach()
 endmacro()
 
+# set default language flags. Must be called before language is enabled.
 set_mode_flags("C;CXX;Fortran" "DEBUG" "-g")
 set_mode_flags("C;CXX;Fortran" "RELWITHDEBINFO" "-g -DNDEBUG")
 set_mode_flags("C;CXX;Fortran" "RELEASE" "-DNDEBUG")
@@ -19,6 +20,9 @@ set(_VASP_SOURCES_O2)
 set(_VASP_SOURCES_O3)
 
 set(VASP_FORTRAN_FLAGS)
+
+# Languages must be enabled to check compiler id
+enable_language(C CXX Fortran)
 
 # note: free and fixed format flags are set through target properties
 if(CMAKE_Fortran_COMPILER_ID STREQUAL "GNU")

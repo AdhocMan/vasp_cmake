@@ -1,6 +1,7 @@
 cmake_minimum_required(VERSION 3.20 FATAL_ERROR)
 set(CMAKE_POLICY_DEFAULT_CMP0048 NEW)
 
+# set default flags. Must be called before project() enables languages.
 include(cmake/default_flags.cmake)
 
 project(vasp
