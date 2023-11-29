@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 3.20 FATAL_ERROR)
 set(CMAKE_POLICY_DEFAULT_CMP0048 NEW)
 
+include(cmake/default_flags.cmake)
+
 project(vasp
     VERSION 6.3.0
     DESCRIPTION "VASP"
@@ -22,7 +24,7 @@ endif()
 if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
 	set(CMAKE_BUILD_TYPE "Release" CACHE STRING "Build type" FORCE)
 	set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS
-		"Debug" "Release" "MinSizeRel" "RelWithDebInfo"
+		"Debug" "Release" "RelWithDebInfo"
 		)
 endif()
 
@@ -67,8 +69,18 @@ cmake_dependent_option(VASP_NCCLP2P "Enable NCCL library collectives instead of 
 
 set(CMAKE_CUDA_ARCHITECTURES "native" CACHE STRING "Cuda architectures list or native for automatic detection. Example: \"60;70;80\"")
 
+# set default optimization flags
+set(VASP_OFLAG_DEFAULT "${_VASP_OFLAG_DEFAULT}" CACHE STRING "")
+set(VASP_OFLAG_O1 "${_VASP_OFLAG_O1}" CACHE STRING "")
+set(VASP_OFLAG_O2 "${_VASP_OFLAG_O2}" CACHE STRING "")
+set(VASP_OFLAG_O3 "${_VASP_OFLAG_O3}" CACHE STRING "")
+set(VASP_OFLAG_LIB "${_VASP_OFLAG_LIB}" CACHE STRING "")
+set(VASP_SOURCES_O1 "${_VASP_SOURCES_O1}" CACHE STRING "")
+set(VASP_SOURCES_O2 "${_VASP_SOURCES_O2}" CACHE STRING "")
+set(VASP_SOURCES_O3 "${_VASP_SOURCES_O3}" CACHE STRING "")
+
+
 set(VASP_EXTERNAL_LIBS)
-set(VASP_FORTRAN_FLAGS)
 
 
 set(VASP_DEFINITIONS
@@ -170,17 +182,10 @@ if(VASP_CUDA)
 	list(APPEND VASP_EXTERNAL_LIBS "-cudalib=cublas,cusolver,cufft,nccl -cuda -acc ${VASP_GPU_FLAG}")
 endif()
 
-
-# set compiler specific settings
-# note: free and fixed format flags are set through target properties
-if(CMAKE_Fortran_COMPILER_ID STREQUAL "GNU")
-	list(APPEND VASP_FORTRAN_FLAGS -ffree-line-length-none -w -ffpe-summary=invalid,zero,overflow -fallow-argument-mismatch)
-elseif(CMAKE_Fortran_COMPILER_ID STREQUAL "NVHPC")
+if(CMAKE_Fortran_COMPILER_ID STREQUAL "NVHPC")
 	find_package(QD MODULE REQUIRED)
 	list(APPEND VASP_EXTERNAL_LIBS QD::qd)
 	list(APPEND VASP_DEFINITIONS qd_emulate)
-	list(APPEND VASP_FORTRAN_FLAGS -Mbackslash -Mlarge_arrays -Mextend -Minform=severe)
 endif()
-
 
 add_subdirectory(src)

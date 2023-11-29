@@ -9,3 +9,4 @@ set_property(TARGET parser_objects PROPERTY CXX_STANDARD 14)
 set_property(TARGET parser_objects PROPERTY CXX_STANDARD_REQUIRED On)
 # __fp16 type used by some FFTW implementations not supported by some compilers like nvhpc
 target_compile_definitions(parser_objects PRIVATE YY_parse_DEBUG=1 __fp16=float)
+target_compile_options(parser_objects PRIVATE ${VASP_OFLAG_DEFAULT})
