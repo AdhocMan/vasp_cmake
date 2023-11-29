@@ -2,7 +2,16 @@ cmake_minimum_required(VERSION 3.20 FATAL_ERROR)
 set(CMAKE_POLICY_DEFAULT_CMP0048 NEW)
 
 # set default flags. Must be called before project() enables languages.
-include(cmake/default_flags.cmake)
+macro(set_mode_flags languages mode value)
+	foreach(lang ${languages})
+		set(CMAKE_${lang}_FLAGS_${mode} "${value}" CACHE STRING "")
+	endforeach()
+endmacro()
+
+set_mode_flags("C;CXX;Fortran" "DEBUG" "-g")
+set_mode_flags("C;CXX;Fortran" "RELWITHDEBINFO" "-g -DNDEBUG")
+set_mode_flags("C;CXX;Fortran" "RELEASE" "-DNDEBUG")
+set_mode_flags("C;CXX;Fortran" "MINSIZEREL" "-DNDEBUG")
 
 project(vasp
     VERSION 6.3.0
@@ -70,19 +79,10 @@ cmake_dependent_option(VASP_NCCLP2P "Enable NCCL library collectives instead of 
 
 set(CMAKE_CUDA_ARCHITECTURES "native" CACHE STRING "Cuda architectures list or native for automatic detection. Example: \"60;70;80\"")
 
-# set default optimization flags
-set(VASP_OFLAG_DEFAULT "${_VASP_OFLAG_DEFAULT}" CACHE STRING "")
-set(VASP_OFLAG_O1 "${_VASP_OFLAG_O1}" CACHE STRING "")
-set(VASP_OFLAG_O2 "${_VASP_OFLAG_O2}" CACHE STRING "")
-set(VASP_OFLAG_O3 "${_VASP_OFLAG_O3}" CACHE STRING "")
-set(VASP_OFLAG_LIB "${_VASP_OFLAG_LIB}" CACHE STRING "")
-set(VASP_SOURCES_O1 "${_VASP_SOURCES_O1}" CACHE STRING "")
-set(VASP_SOURCES_O2 "${_VASP_SOURCES_O2}" CACHE STRING "")
-set(VASP_SOURCES_O3 "${_VASP_SOURCES_O3}" CACHE STRING "")
-
+# Additional options for source file selection and optimization flags
+include(cmake/sources_and_flags_options.cmake)
 
 set(VASP_EXTERNAL_LIBS)
-
 
 set(VASP_DEFINITIONS
 	MPI

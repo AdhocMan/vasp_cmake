@@ -12,17 +12,9 @@ function(vasp_create_executable name sources)
 endfunction()
 
 
-file(READ ".objects" VASP_OBJECTS_CONTENT)
+set(VASP_SOURCES ${VASP_SOURCES} ${VASP_SOURCES_DEFAULT} ${VASP_SOURCES_O1} ${VASP_SOURCES_O2} ${VASP_SOURCES_O3} ${VASP_SOURCES_IN})
+list(APPEND VASP_SOURCES main.F)
 
-string(REGEX MATCHALL "[a-zA-Z_0-9-]+\.o" VASP_OBJECTS ${VASP_OBJECTS_CONTENT})
-
-set(VASP_SOURCES)
-foreach(object IN LISTS VASP_OBJECTS)
-    string(REGEX REPLACE "\\.[^.]*$" "" file_name ${object})
-    list(APPEND VASP_SOURCES ${file_name}.F)
-endforeach()
-
-list(APPEND VASP_SOURCES fftmpiw.F fftmpi_map.F fftw3d.F fft3dlib.F main.F)
 list(REMOVE_ITEM VASP_SOURCES
 	wave_gpu.F # does not exist
 	)
@@ -36,14 +28,17 @@ list(REMOVE_DUPLICATES VASP_SOURCES)
 # set optmization flags
 foreach(source IN LISTS VASP_SOURCES)
 	set(_opt_flag ${VASP_OFLAG_DEFAULT})
-	if(${source} IN_LIST VASP_SOURCES_O1)
-		set(_opt_flag ${VASP_OFLAG_O1})
+	if(${source} IN_LIST VASP_SOURCES_O3)
+		set(_opt_flag ${VASP_OFLAG_O3})
 	endif()
 	if(${source} IN_LIST VASP_SOURCES_O2)
 		set(_opt_flag ${VASP_OFLAG_O2})
 	endif()
-	if(${source} IN_LIST VASP_SOURCES_O3)
-		set(_opt_flag ${VASP_OFLAG_O3})
+	if(${source} IN_LIST VASP_SOURCES_O1)
+		set(_opt_flag ${VASP_OFLAG_O1})
+	endif()
+	if(${source} IN_LIST VASP_SOURCES_IN)
+		set(_opt_flag ${VASP_OFLAG_IN})
 	endif()
 	set_source_files_properties(${source} PROPERTIES COMPILE_FLAGS "${_opt_flag}")
 endforeach()
