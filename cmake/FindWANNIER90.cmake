@@ -33,7 +33,7 @@ find_path(
     WANNIER90_INCLUDE_DIRS
     NAMES w90_wannierise.mod
     HINTS ${_WANNIER90_PATHS}
-    PATH_SUFFIXES "include" "inc" "wannier90" "wannier90/include" "include/wannier90"
+    PATH_SUFFIXES "modules" "wannier90/modules" "include" "inc" "wannier90" "wannier90/include" "include/wannier90"
 )
 
 # check if found

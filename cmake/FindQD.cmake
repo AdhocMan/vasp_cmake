@@ -50,7 +50,7 @@ find_path(
     QD_INCLUDE_DIRS
     NAMES qdmodule.mod
     HINTS ${_QD_PATHS}
-    PATH_SUFFIXES "qd" "qd/include" "include/qd" "compilers/extras/qd/include/qd"
+    PATH_SUFFIXES "modules" "qd/modules" "qd" "qd/include" "include/qd" "compilers/extras/qd/include/qd"
 )
 
 # check if found
