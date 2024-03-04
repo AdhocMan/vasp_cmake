@@ -64,6 +64,7 @@ option(VASP_SHMEM_BCAST "Enable shared memory MPI bcast" OFF)
 option(VASP_SHMEM_RPROJ "Enable shared memory for PAW projections" OFF)
 option(VASP_SYSV "Enable shared-memory for ipcs and system-V" OFF)
 option(VASP_BSE "Enable BSE method" ON)
+option(VASP_MPI_INPLACE "Use MPI inplace" ON)
 
 option(VASP_OPENMP "Enable OpenMP" OFF)
 option(VASP_FFTLIB "Enable internal FFTLIB" OFF)
@@ -89,6 +90,7 @@ set(VASP_DEFINITIONS
 	"HOST=\"${VASP_HOST_NAME}\""
 	MPI_BLOCK=${VASP_MPI_BLOCK}
 	CACHE_SIZE=${VASP_CACHE_SIZE}
+	$<$<BOOL:${VASP_MPI_INPLACE}>:MPI_INPLACE>
 	$<$<BOOL:${VASP_PROFILING}>:PROFILING>
 	$<$<BOOL:${VASP_COLLECTIVE}>:use_collective>
 	$<$<BOOL:${VASP_AVOIDALLOC}>:avoidalloc>
