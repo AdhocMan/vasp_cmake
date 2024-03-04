@@ -66,7 +66,7 @@ option(VASP_SYSV "Enable shared-memory for ipcs and system-V" OFF)
 option(VASP_BSE "Enable BSE method" ON)
 
 option(VASP_OPENMP "Enable OpenMP" OFF)
-cmake_dependent_option(VASP_FFTLIB "Enable internal FFTLIB" ON "VASP_OPENMP" OFF)
+option(VASP_FFTLIB "Enable internal FFTLIB" OFF)
 option(VASP_SCALAPACK "Enable ScaLAPACK" OFF)
 option(VASP_HDF5 "Enable hdf5" OFF)
 option(VASP_LIBBEEF "Enable libbeef for van-der-Waals functionals" OFF)
