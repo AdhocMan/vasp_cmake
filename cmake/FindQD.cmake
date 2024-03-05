@@ -38,19 +38,19 @@ find_library(
     QD_LIBRARIES
     NAMES qd
     HINTS ${_QD_PATHS}
-    PATH_SUFFIXES "qd/lib" "qd/lib64" "qd" "compilers/extras/qd/lib"
+    PATH_SUFFIXES "qd/lib" "qd/lib64" "qd" "compilers/extras/qd/lib" "lib" "lib64"
 )
 find_library(
     QD_FORTRAN_LIBRARIES
     NAMES qdmod
     HINTS ${_QD_PATHS}
-    PATH_SUFFIXES "qd/lib" "qd/lib64" "qd" "compilers/extras/qd/lib"
+    PATH_SUFFIXES "qd/lib" "qd/lib64" "qd" "compilers/extras/qd/lib" "lib" "lib64"
 )
 find_path(
     QD_INCLUDE_DIRS
     NAMES qdmodule.mod
     HINTS ${_QD_PATHS}
-    PATH_SUFFIXES "modules" "qd/modules" "qd" "qd/include" "include/qd" "compilers/extras/qd/include/qd"
+    PATH_SUFFIXES "modules" "qd/modules" "qd" "qd/include" "include/qd" "qd/include/qd" "compilers/extras/qd/include/qd" "include"
 )
 
 # check if found
