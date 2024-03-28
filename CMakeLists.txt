@@ -8,10 +8,15 @@ macro(set_mode_flags languages mode value)
 	endforeach()
 endmacro()
 
-set_mode_flags("C;CXX;Fortran" "DEBUG" "-g")
-set_mode_flags("C;CXX;Fortran" "RELWITHDEBINFO" "-g -DNDEBUG")
-set_mode_flags("C;CXX;Fortran" "RELEASE" "-DNDEBUG")
-set_mode_flags("C;CXX;Fortran" "MINSIZEREL" "-DNDEBUG")
+set_mode_flags("C;CXX" "DEBUG" "-g")
+set_mode_flags("C;CXX" "RELWITHDEBINFO" "-g -DNDEBUG")
+set_mode_flags("C;CXX" "RELEASE" "-DNDEBUG")
+set_mode_flags("C;CXX" "MINSIZEREL" "-DNDEBUG")
+
+set_mode_flags("Fortran" "DEBUG" "-g")
+set_mode_flags("Fortran" "RELWITHDEBINFO" "-g")
+set_mode_flags("Fortran" "RELEASE" "")
+set_mode_flags("Fortran" "MINSIZEREL" "")
 
 project(vasp
     VERSION 6.3.0
