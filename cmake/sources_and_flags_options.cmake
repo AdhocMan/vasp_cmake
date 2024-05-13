@@ -58,6 +58,7 @@ elseif(CMAKE_Fortran_COMPILER_ID STREQUAL "Intel")
 elseif(CMAKE_Fortran_COMPILER_ID STREQUAL "NVHPC")
 	list(APPEND VASP_FORTRAN_FLAGS -Mbackslash -Mlarge_arrays -Mextend -Minform=severe)
     set(_VASP_OFLAG_DEFAULT -fast)
+	set(_VASP_OFLAG_MAIN -O0 -traceback)
 	# overwrite list of specially optimized files
     set(_VASP_SOURCES_O1 pade_fit.F minimax_dependence.F)
     set(_VASP_SOURCES_O2 pead.F)
