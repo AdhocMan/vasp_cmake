@@ -59,10 +59,8 @@ target_compile_definitions(vasp_std PRIVATE NGZhalf)
 
 vasp_create_executable(vasp_gam "${VASP_SOURCES}")
 target_compile_definitions(vasp_gam PRIVATE NGZhalf wNGZhalf)
-add_dependencies(vasp_gam vasp_std)
 
 vasp_create_executable(vasp_ncl "${VASP_SOURCES}")
-add_dependencies(vasp_ncl vasp_gam)
 
 install(TARGETS vasp_std DESTINATION ${CMAKE_INSTALL_BINDIR})
 install(TARGETS vasp_gam DESTINATION ${CMAKE_INSTALL_BINDIR})
