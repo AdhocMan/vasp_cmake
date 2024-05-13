@@ -20,5 +20,5 @@ set_target_properties(lib_objects PROPERTIES Fortran_FORMAT FREE)
 target_compile_options(lib_objects PRIVATE $<$<COMPILE_LANGUAGE:Fortran>:${VASP_LIB_FORTRAN_FLAGS}> $<$<COMPILE_LANGUAGE:Fortran>:${VASP_OFLAG_LIB}> $<$<COMPILE_LANGUAGE:C>:${VASP_OFLAG_C_LIB}>)
 
 if(CMAKE_C_COMPILER_ID STREQUAL "NVHPC")
-	target_compile_options(lib_objects PRIVATE  $<$<COMPILE_LANGUAGE:C>:--no_warnings>)
+	target_compile_options(lib_objects PRIVATE  $<$<COMPILE_LANGUAGE:C>:--diag_suppress set_but_not_used>)
 endif()
