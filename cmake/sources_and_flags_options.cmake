@@ -14,13 +14,13 @@ file(READ "${PROJECT_SOURCE_DIR}/src/.objects" VASP_OBJECTS_CONTENT)
 
 # convert a string containing object file names to a list of fortran files with ".F" suffix
 function(objects_to_fortran_files objects_string out_var_name)
-	string(REGEX MATCHALL "[a-zA-Z_0-9-]+\.o" objects ${objects_string})
-	set(_files)
-	foreach(obj IN LISTS objects)
-		string(REGEX REPLACE "\\.[^.]*$" "" file_name ${obj})
-		list(APPEND _files ${file_name}.F)
-	endforeach()
-	set(${out_var_name}  ${_files} PARENT_SCOPE)
+    string(REGEX MATCHALL "[a-zA-Z_0-9-]+\.o" objects ${objects_string})
+    set(_files)
+    foreach(obj IN LISTS objects)
+        string(REGEX REPLACE "\\.[^.]*$" "" file_name ${obj})
+        list(APPEND _files ${file_name}.F)
+    endforeach()
+    set(${out_var_name}  ${_files} PARENT_SCOPE)
 endfunction()
 
 string(REGEX MATCH ".*SOURCE_O1" _VASP_OBJECTS ${VASP_OBJECTS_CONTENT})
@@ -45,30 +45,30 @@ enable_language(C CXX Fortran)
 set(VASP_FORTRAN_FLAGS)
 # note: free and fixed format flags are set through target properties
 if(CMAKE_Fortran_COMPILER_ID STREQUAL "GNU")
-	list(APPEND VASP_FORTRAN_FLAGS -ffree-line-length-none -w -ffpe-summary=invalid,zero,overflow -fallow-argument-mismatch)
-	# extend list of specially optimized files
-	list(APPEND _VASP_SOURCES_O1 fftw3d.F fftmpi.F fftmpiw.F)
-	list(APPEND _VASP_SOURCES_O2 fft3dlib.F)
+    list(APPEND VASP_FORTRAN_FLAGS -ffree-line-length-none -w -ffpe-summary=invalid,zero,overflow -fallow-argument-mismatch)
+    # extend list of specially optimized files
+    list(APPEND _VASP_SOURCES_O1 fftw3d.F fftmpi.F fftmpiw.F)
+    list(APPEND _VASP_SOURCES_O2 fft3dlib.F)
 elseif(CMAKE_Fortran_COMPILER_ID STREQUAL "Intel")
-	list(APPEND VASP_FORTRAN_FLAGS -w0 -names lowercase -assume byterecl -w)
-	set(_VASP_OFLAG_DEFAULT -O2)
-	# extend list of specially optimized files
-	list(APPEND _VASP_SOURCES_O1 fftw3d.F fftmpi.F fftmpiw.F)
-	list(APPEND _VASP_SOURCES_O2 fft3dlib.F)
+    list(APPEND VASP_FORTRAN_FLAGS -w0 -names lowercase -assume byterecl -w)
+    set(_VASP_OFLAG_DEFAULT -O2)
+    # extend list of specially optimized files
+    list(APPEND _VASP_SOURCES_O1 fftw3d.F fftmpi.F fftmpiw.F)
+    list(APPEND _VASP_SOURCES_O2 fft3dlib.F)
 elseif(CMAKE_Fortran_COMPILER_ID STREQUAL "NVHPC")
-	list(APPEND VASP_FORTRAN_FLAGS -Mbackslash -Mlarge_arrays -Mextend -Minform=severe)
+    list(APPEND VASP_FORTRAN_FLAGS -Mbackslash -Mlarge_arrays -Mextend -Minform=severe)
     set(_VASP_OFLAG_DEFAULT -fast)
-	set(_VASP_OFLAG_MAIN -O0 -traceback)
-	# overwrite list of specially optimized files
+    set(_VASP_OFLAG_MAIN -O0 -traceback)
+    # overwrite list of specially optimized files
     set(_VASP_SOURCES_O1 pade_fit.F minimax_dependence.F)
     set(_VASP_SOURCES_O2 pead.F)
 endif()
 
 if(NOT _VASP_OFLAG_IN)
-	set(_VASP_OFLAG_IN ${_VASP_OFLAG_DEFAULT})
+    set(_VASP_OFLAG_IN ${_VASP_OFLAG_DEFAULT})
 endif()
 if(NOT _VASP_OFLAG_LIB)
-	set(_VASP_OFLAG_LIB ${_VASP_OFLAG_O1})
+    set(_VASP_OFLAG_LIB ${_VASP_OFLAG_O1})
 endif()
 
 

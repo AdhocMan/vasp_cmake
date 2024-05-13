@@ -1,6 +1,6 @@
 add_library(fftlib_objects OBJECT
-	src/fftlib.cpp
-	)
+    src/fftlib.cpp
+    )
 
 target_link_libraries(fftlib_objects PRIVATE ${VASP_EXTERNAL_LIBS})
 set_property(TARGET fftlib_objects PROPERTY CXX_STANDARD 14)
