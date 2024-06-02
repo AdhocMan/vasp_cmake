@@ -43,7 +43,7 @@ foreach(source IN LISTS VASP_SOURCES)
     if(${source} STREQUAL "main.F")
         set(_opt_flag ${VASP_OFLAG_MAIN})
     endif()
-    set_source_files_properties(${source} PROPERTIES COMPILE_FLAGS "${_opt_flag}")
+    set_source_files_properties(${source} PROPERTIES COMPILE_FLAGS ${_opt_flag})
 endforeach()
 
 if(VASP_FFTLIB)
