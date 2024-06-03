@@ -43,7 +43,8 @@ foreach(source IN LISTS VASP_SOURCES)
     if(${source} STREQUAL "main.F")
         set(_opt_flag ${VASP_OFLAG_MAIN})
     endif()
-    set_source_files_properties(${source} PROPERTIES COMPILE_FLAGS ${_opt_flag})
+    list(JOIN _opt_flag " " _opt_flag_str) # convert list to string
+    set_source_files_properties(${source} PROPERTIES COMPILE_FLAGS ${_opt_flag_str})
 endforeach()
 
 if(VASP_FFTLIB)
