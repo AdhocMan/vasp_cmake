@@ -82,7 +82,7 @@ option(VASP_LIBXC "Enable Libxc library" OFF)
 option(VASP_CUDA "Enable cuda accelaration" OFF)
 set(VASP_CUDA_VERSION "Default" CACHE STRING "Set the CUDA version passed on to the NVHPC compiler")
 cmake_dependent_option(VASP_NCCLP2P "Enable NCCL library collectives instead of MPI" ON "VASP_CUDA" OFF)
-cmake_dependent_option(VASP_CUSOLVERMP "Enable usage of cuSOLVERmp" ON "VASP_CUDA" OFF)
+cmake_dependent_option(VASP_CUSOLVERMP "Enable usage of cuSOLVERmp" OFF "VASP_CUDA" OFF)
 
 set(CMAKE_CUDA_ARCHITECTURES "native" CACHE STRING "Cuda architectures list or native for automatic detection. Example: \"60;70;80\"")
 
@@ -195,7 +195,7 @@ if(VASP_CUDA)
     endif()
 
     list(APPEND VASP_FORTRAN_FLAGS -acc ${VASP_GPU_FLAG})
-    list(APPEND VASP_EXTERNAL_LIBS "${_CUDA_LIB_LIST} -cuda -acc ${VASP_GPU_FLAG}")
+    list(APPEND VASP_EXTERNAL_LIBS "-cudalib=${_CUDA_LIB_LIST} -cuda -acc ${VASP_GPU_FLAG}")
 endif()
 
 if(CMAKE_Fortran_COMPILER_ID STREQUAL "NVHPC")
