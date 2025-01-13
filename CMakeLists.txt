@@ -68,7 +68,6 @@ option(VASP_SHMEM "Enable shared memory for reduced memory usage" OFF)
 option(VASP_SHMEM_BCAST "Enable shared memory MPI bcast" OFF)
 option(VASP_SHMEM_RPROJ "Enable shared memory for PAW projections" OFF)
 option(VASP_SYSV "Enable shared-memory for ipcs and system-V" OFF)
-option(VASP_BSE "Enable BSE method" ON)
 option(VASP_MPI_INPLACE "Use MPI inplace" ON)
 
 option(VASP_OPENMP "Enable OpenMP" OFF)
@@ -107,14 +106,13 @@ set(VASP_DEFINITIONS
     $<$<BOOL:${VASP_SHMEM_BCAST}>:shmem_bcast_buffer>
     $<$<BOOL:${VASP_SHMEM_RPROJ}>:shmem_rproj>
     $<$<BOOL:${VASP_SYSV}>:sysv>
-    $<$<BOOL:${VASP_BSE}>:use_bse_te>
     $<$<BOOL:${VASP_OPENMP}>:_OPENMP>
     $<$<BOOL:${VASP_SCALAPACK}>:scaLAPACK>
     $<$<BOOL:${VASP_HDF5}>:VASP_HDF5>
     $<$<BOOL:${VASP_LIBXC}>:USELIBXC>
     $<$<BOOL:${VASP_WANNIER90}>:VASP2WANNIER90>
     # nvhpc already defines _OPENACC with "-acc", but not defining it seems to cause issues with dependency detection with make. Ninja works without it.
-    $<$<BOOL:${VASP_CUDA}>:_OPENACC>
+    $<$<BOOL:${VASP_CUDA}>:ACC_OFFLOAD>
     $<$<BOOL:${VASP_CUDA}>:USENCCL>
     $<$<BOOL:${VASP_NCCLP2P}>:USENCCLP2P>
     $<$<BOOL:${VASP_CUSOLVERMP}>:CUSOLVERMP>

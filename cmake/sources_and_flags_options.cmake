@@ -32,7 +32,7 @@ objects_to_fortran_files(${_VASP_OBJECTS_O1} _VASP_SOURCES_O1)
 objects_to_fortran_files(${_VASP_OBJECTS_O2} _VASP_SOURCES_O2)
 objects_to_fortran_files(${_VASP_OBJECTS_IN} _VASP_SOURCES_IN)
 
-set(_VASP_SOURCES "fftmpiw.F;fftmpi_map.F;fftw3d.F;fft3dlib.F")
+set(_VASP_SOURCES "")
 
 
 #################################
