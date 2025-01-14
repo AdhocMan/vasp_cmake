@@ -79,6 +79,7 @@ option(VASP_DFTD4 "Enable DFTD4 library" OFF)
 option(VASP_WANNIER90 "Enable Wannier90 library" OFF)
 option(VASP_LIBXC "Enable Libxc library" OFF)
 option(VASP_CUDA "Enable cuda accelaration" OFF)
+option(VASP_CRAY_MPICH "Enable overwrite of CUDA aware mpi check for cray mpich" OFF)
 set(VASP_CUDA_VERSION "Default" CACHE STRING "Set the CUDA version passed on to the NVHPC compiler")
 cmake_dependent_option(VASP_NCCLP2P "Enable NCCL library collectives instead of MPI" ON "VASP_CUDA" OFF)
 cmake_dependent_option(VASP_CUSOLVERMP "Enable usage of cuSOLVERmp" OFF "VASP_CUDA" OFF)
@@ -117,6 +118,7 @@ set(VASP_DEFINITIONS
     $<$<BOOL:${VASP_NCCLP2P}>:USENCCLP2P>
     $<$<BOOL:${VASP_CUSOLVERMP}>:CUSOLVERMP>
     $<$<BOOL:${VASP_CUSOLVERMP}>:CUBLASMP>
+    $<$<BOOL:${VASP_CRAY_MPICH}>:CRAY_MPICH>
     )
 
 if(VASP_OPENMP)
