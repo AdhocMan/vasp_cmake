@@ -115,6 +115,7 @@ set(VASP_DEFINITIONS
     # nvhpc already defines _OPENACC with "-acc", but not defining it seems to cause issues with dependency detection with make. Ninja works without it.
     $<$<BOOL:${VASP_CUDA}>:ACC_OFFLOAD>
     $<$<BOOL:${VASP_CUDA}>:USENCCL>
+    $<$<BOOL:${VASP_CUDA}>:NVCUDA>
     $<$<BOOL:${VASP_NCCLP2P}>:USENCCLP2P>
     $<$<BOOL:${VASP_CUSOLVERMP}>:CUSOLVERMP>
     $<$<BOOL:${VASP_CUSOLVERMP}>:CUBLASMP>
