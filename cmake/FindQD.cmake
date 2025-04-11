@@ -19,9 +19,11 @@
 #   QD::qd
 
 #set paths to look for library from ROOT variables.If new policy is set, find_library() automatically uses them.
+set(_QD_PATHS)
 if(NOT POLICY CMP0074)
     set(_QD_PATHS ${QD_ROOT} $ENV{QD_ROOT})
 endif()
+list(APPEND _QD_PATHS ${CMAKE_LIBRARY_PATH_LIST})
 
 if(CMAKE_Fortran_COMPILER_ID STREQUAL "NVHPC")
     get_filename_component(QD_PREFIX_PATH ${CMAKE_Fortran_COMPILER} DIRECTORY)
@@ -55,15 +57,21 @@ find_path(
 
 # check if found
 include(FindPackageHandleStandardArgs)
-find_package_handle_standard_args(QD REQUIRED_VARS QD_INCLUDE_DIRS QD_LIBRARIES QD_FORTRAN_LIBRARIES)
+find_package_handle_standard_args(QD
+                                  REQUIRED_VARS QD_INCLUDE_DIRS QD_LIBRARIES QD_FORTRAN_LIBRARIES
+                                  FAIL_MESSAGE "Could not find QD library, please specify QD_ROOT or set as environment variable")
 
 # add target to link against
 if(QD_FOUND)
-    if(NOT TARGET QD::qd)
-        add_library(QD::qd INTERFACE IMPORTED)
-    endif()
-    set_property(TARGET QD::qd PROPERTY INTERFACE_LINK_LIBRARIES ${QD_LIBRARIES} ${QD_FORTRAN_LIBRARIES})
-    set_property(TARGET QD::qd PROPERTY INTERFACE_INCLUDE_DIRECTORIES ${QD_INCLUDE_DIRS})
+  if(NOT QD_MESSAGE_SHOWN)
+    message(STATUS "Found QD library: ${QD_LIBRARIES}")
+  endif()
+  set(QD_MESSAGE_SHOWN TRUE CACHE INTERNAL "Message shown flag")
+  if(NOT TARGET QD::qd)
+      add_library(QD::qd INTERFACE IMPORTED)
+  endif()
+  set_property(TARGET QD::qd PROPERTY INTERFACE_LINK_LIBRARIES ${QD_LIBRARIES} ${QD_FORTRAN_LIBRARIES})
+  set_property(TARGET QD::qd PROPERTY INTERFACE_INCLUDE_DIRECTORIES ${QD_INCLUDE_DIRS})
 endif()
 
 # prevent clutter in cache

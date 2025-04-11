@@ -19,9 +19,11 @@
 #   WANNIER90::wannier90
 
 #set paths to look for library from ROOT variables.If new policy is set, find_library() automatically uses them.
+set(_WANNIER90_PATHS)
 if(NOT POLICY CMP0074)
     set(_WANNIER90_PATHS ${WANNIER90_ROOT} $ENV{WANNIER90_ROOT})
 endif()
+list(APPEND _WANNIER90_PATHS ${CMAKE_LIBRARY_PATH_LIST})
 
 find_library(
     WANNIER90_LIBRARIES
@@ -38,15 +40,21 @@ find_path(
 
 # check if found
 include(FindPackageHandleStandardArgs)
-find_package_handle_standard_args(WANNIER90 REQUIRED_VARS WANNIER90_INCLUDE_DIRS WANNIER90_LIBRARIES)
+find_package_handle_standard_args(WANNIER90
+                                  REQUIRED_VARS WANNIER90_INCLUDE_DIRS WANNIER90_LIBRARIES
+                                  FAIL_MESSAGE "Could not find Wannier90 library, please specify WANNIER90_ROOT or set as environment variable")
 
 # add target to link against
 if(WANNIER90_FOUND)
-    if(NOT TARGET WANNIER90::wannier90)
-        add_library(WANNIER90::wannier90 INTERFACE IMPORTED)
-    endif()
-    set_property(TARGET WANNIER90::wannier90 PROPERTY INTERFACE_LINK_LIBRARIES ${WANNIER90_LIBRARIES})
-    set_property(TARGET WANNIER90::wannier90 PROPERTY INTERFACE_INCLUDE_DIRECTORIES ${WANNIER90_INCLUDE_DIRS})
+  if(NOT W90_MESSAGE_SHOWN)
+    message(STATUS "Found Wannier90 library: ${WANNIER90_LIBRARIES}")
+  endif()
+  set(W90_MESSAGE_SHOWN TRUE CACHE INTERNAL "Message shown flag")
+  if(NOT TARGET WANNIER90::wannier90)
+      add_library(WANNIER90::wannier90 INTERFACE IMPORTED)
+  endif()
+  set_property(TARGET WANNIER90::wannier90 PROPERTY INTERFACE_LINK_LIBRARIES ${WANNIER90_LIBRARIES})
+  set_property(TARGET WANNIER90::wannier90 PROPERTY INTERFACE_INCLUDE_DIRECTORIES ${WANNIER90_INCLUDE_DIRS})
 endif()
 
 # prevent clutter in cache

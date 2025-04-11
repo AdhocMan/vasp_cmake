@@ -19,9 +19,11 @@
 #   LibXC::libxc
 
 #set paths to look for library from ROOT variables.If new policy is set, find_library() automatically uses them.
+set(_LibXC_PATHS)
 if(NOT POLICY CMP0074)
     set(_LibXC_PATHS ${LibXC_ROOT} $ENV{LibXC_ROOT})
 endif()
+list(APPEND _LibXC_PATHS ${CMAKE_LIBRARY_PATH_LIST})
 
 find_library(
     LibXC_LIBRARIES
@@ -44,15 +46,21 @@ find_path(
 
 # check if found
 include(FindPackageHandleStandardArgs)
-find_package_handle_standard_args(LibXC REQUIRED_VARS LibXC_INCLUDE_DIRS LibXC_LIBRARIES LibXC_FORTRAN_LIBRARIES)
+find_package_handle_standard_args(LibXC
+                                  REQUIRED_VARS LibXC_INCLUDE_DIRS LibXC_LIBRARIES LibXC_FORTRAN_LIBRARIES
+                                  FAIL_MESSAGE "Could not find LibXC library, please specify LibXC_ROOT or set as environment variable")
 
 # add target to link against
 if(LibXC_FOUND)
-    if(NOT TARGET LibXC::libxc)
-        add_library(LibXC::libxc INTERFACE IMPORTED)
-    endif()
-    set_property(TARGET LibXC::libxc PROPERTY INTERFACE_LINK_LIBRARIES ${LibXC_LIBRARIES} ${LibXC_FORTRAN_LIBRARIES})
-    set_property(TARGET LibXC::libxc PROPERTY INTERFACE_INCLUDE_DIRECTORIES ${LibXC_INCLUDE_DIRS})
+  if(NOT LIBXC_MESSAGE_SHOWN)
+    message(STATUS "Found LIBXC library: ${LibXC_LIBRARIES}")
+  endif()
+  set(LIBXC_MESSAGE_SHOWN TRUE CACHE INTERNAL "Message shown flag")
+  if(NOT TARGET LibXC::libxc)
+      add_library(LibXC::libxc INTERFACE IMPORTED)
+  endif()
+  set_property(TARGET LibXC::libxc PROPERTY INTERFACE_LINK_LIBRARIES ${LibXC_LIBRARIES} ${LibXC_FORTRAN_LIBRARIES})
+  set_property(TARGET LibXC::libxc PROPERTY INTERFACE_INCLUDE_DIRECTORIES ${LibXC_INCLUDE_DIRS})
 endif()
 
 # prevent clutter in cache

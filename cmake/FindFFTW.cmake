@@ -25,12 +25,22 @@ endif()
 
 macro(find_ffftw_component name lib_name lib_symbol)
     # set paths to look for library
-    set(_FFTW_${name}_PATHS ${FFTW_${name}_ROOT} $ENV{FFTW_${name}_ROOT})
-    set(_FFTW_${name}_INCLUDE_PATHS)
+    if(DEFINED ENV{FFTW_${name}_ROOT} AND NOT "$ENV{FFTW_${name}_ROOT}" STREQUAL "")
+      set(_FFTW_${name}_PATHS $ENV{FFTW_${name}_ROOT})
+    else()
+      # Check for FFTW_ROOT environment variable
+      if(DEFINED ENV{FFTW_ROOT} AND NOT "$ENV{FFTW_ROOT}" STREQUAL "")
+        set(_FFTW_${name}_PATHS $ENV{FFTW_ROOT})
+      else()
+        # Default to LIBRARY_PATH if neither is set
+        set(_FFTW_${name}_PATHS ${CMAKE_LIBRARY_PATH_LIST})
+      endif()
+    endif()
+    set(_FFTW_${name}_INCLUDE_PATHS ${CMAKE_INCLUDE_PATH_LIST})
 
     set(_FFTW_${name}_DEFAULT_PATH_SWITCH)
 
-
+    # check if FFTW is contained in BLAS library
     if(TARGET BLAS::BLAS)
         set(CMAKE_REQUIRED_LIBRARIES BLAS::BLAS)
 
@@ -50,6 +60,10 @@ macro(find_ffftw_component name lib_name lib_symbol)
         endif()
     endif()
 
+    # also add MKLROOT if it is defined:
+    if(DEFINED ENV{MKLROOT})
+        list(APPEND _FFTW_${name}_PATHS $ENV{MKLROOT})
+    endif()
 
     if(_FFTW_${name}_PATHS)
         # disable default paths if ROOT is set
@@ -69,7 +83,7 @@ macro(find_ffftw_component name lib_name lib_symbol)
             FFTW_${name}_LIBRARIES
             NAMES ${lib_name}
             HINTS ${_FFTW_${name}_PATHS}
-            PATH_SUFFIXES "lib" "lib64"
+            PATH_SUFFIXES "lib" "lib64" "lib/x86_64-linux-gnu"
             ${_FFTW_${name}_DEFAULT_PATH_SWITCH}
         )
     endif()
@@ -84,11 +98,19 @@ macro(find_ffftw_component name lib_name lib_symbol)
 
     # add target to link against
     if(FFTW_${name}_LIBRARIES AND FFTW_${name}_INCLUDE_DIRS)
+        if(NOT FFTW_MESSAGE_SHOWN)
+          if(${FFTW_${name}_LIBRARIES} STREQUAL "BLAS::BLAS")
+            message(STATUS "Found FFTW library: ${FFTW_${name}_LIBRARIES} (contained in BLAS)")
+          else()
+            message(STATUS "Found FFTW library: ${FFTW_${name}_LIBRARIES}")
+          endif()
+        endif()
         if(NOT TARGET FFTW::FFTW_${name})
             add_library(FFTW::FFTW_${name} INTERFACE IMPORTED)
         endif()
         set_property(TARGET FFTW::FFTW_${name} PROPERTY INTERFACE_LINK_LIBRARIES ${FFTW_${name}_LIBRARIES})
         set_property(TARGET FFTW::FFTW_${name} PROPERTY INTERFACE_INCLUDE_DIRECTORIES ${FFTW_${name}_INCLUDE_DIRS})
+        set(FFTW_MESSAGE_SHOWN TRUE CACHE INTERNAL "Message shown flag")
     endif()
 
     # prevent clutter in cache
@@ -125,5 +147,7 @@ endforeach()
 
 # check if found
 include(FindPackageHandleStandardArgs)
-find_package_handle_standard_args(FFTW REQUIRED_VARS ${FFTW_REQUIRED_VARS})
+find_package_handle_standard_args(FFTW
+                                  REQUIRED_VARS ${FFTW_REQUIRED_VARS}
+                                  FAIL_MESSAGE "Could not find FFTW libraries, please specify FFTW_ROOT or set as environment variable")
 MARK_AS_ADVANCED(FFTW_FOUND)
