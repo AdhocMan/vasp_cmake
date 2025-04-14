@@ -42,7 +42,7 @@ if(NOT SCALAPACK_LIBRARIES AND LAPACK_LIBRARIES MATCHES "mkl")
     set(MPI_MODE intelmpi)
   endif()
 
-  # now check if lapack is lp or ilp
+  # now check if lapack is lp or ilp and use scalapack from mkl
   if(LAPACK_LIBRARIES MATCHES "ilp64")
      set(MKL_SCALAPACK_NAMES mkl_scalapack_ilp64)
     set(MKL_BLACS_MPI_NAMES mkl_blacs_${$MPI_MODE}_ilp64)
@@ -75,13 +75,10 @@ if(NOT SCALAPACK_LIBRARIES AND LAPACK_LIBRARIES MATCHES "mkl")
   endif()
 endif()
 
-# if we did not find it till here throy an error
-if(NOT SCALAPACK_LIBRARIES)
-  message(FATAL_ERROR "Could not find Scalapack libraries, please specify SCALAPACK_ROOT")
-endif()
-
 include(FindPackageHandleStandardArgs)
-find_package_handle_standard_args(SCALAPACK REQUIRED_VARS SCALAPACK_LIBRARIES)
+find_package_handle_standard_args(SCALAPACK
+                                  REQUIRED_VARS SCALAPACK_LIBRARIES
+                                  FAIL_MESSAGE "Could not find ScaLAPACK, please specify SCALAPACK_ROOT or set as environment variable")
 
 # add target to link against
 if(SCALAPACK_FOUND)

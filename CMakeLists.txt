@@ -100,10 +100,11 @@ option(VASP_LIBXC "Enable Libxc library" OFF)
 option(VASP_CUDA "Enable cuda accelaration" OFF)
 option(VASP_OMP_OFFLOAD "Enable OMP device offloading" OFF)
 set(VASP_CUDA_VERSION "Default" CACHE STRING "Set the CUDA version passed on to the NVHPC compiler")
-cmake_dependent_option(VASP_NCCL "Enable NCCL library collectives instead of MPI" ON "VASP_CUDA" OFF)
 cmake_dependent_option(VASP_CUSOLVERMP "Enable usage of cuSOLVERmp" OFF "VASP_CUDA" OFF)
 
 set(VASP_PP_EXTRA "" CACHE STRING "Extra preprocessor flags not covered by the options above")
+
+option(VASP_TESTSUITE "Enable testsuite in build dir" ON)
 
 set(CMAKE_CUDA_ARCHITECTURES "native" CACHE STRING "Cuda architectures list or native for automatic detection. Example: \"60;70;80\"")
 
@@ -373,8 +374,7 @@ set(PP_MESSAGE_SHOWN TRUE CACHE INTERNAL "Message shown flag")
 add_subdirectory(src)
 
 # Testing
-option(Build_Tests "Build tests" ON)
-if(Build_Tests)
+if(VASP_TESTSUITE)
   # for now just use the custom runtest script
   # enable testing here if other tests are added
   # enable_testing()
