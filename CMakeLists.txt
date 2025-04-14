@@ -224,23 +224,7 @@ include(CheckLanguage)
 check_language(CUDA)
 if(CMAKE_CUDA_COMPILER)
   enable_language(CUDA)
-  #Get CUDA compute capability
-  set(OUTPUTFILE ${CMAKE_CURRENT_BINARY_DIR}/cuda_script) # No suffix required
-  set(CUDAFILE ${CMAKE_CURRENT_SOURCE_DIR}/cmake/check_cuda.cu)
-  execute_process(COMMAND nvcc -lcuda ${CUDAFILE} -o ${OUTPUTFILE})
-  execute_process(COMMAND ${OUTPUTFILE}
-                  RESULT_VARIABLE CUDA_RETURN_CODE
-                  OUTPUT_VARIABLE AUTO_CUDA_ARCH)
-
-  if(${CUDA_RETURN_CODE} EQUAL 0)
-    set(CUDA_SUCCESS "TRUE")
-    set(VASP_CUDA ON)
-  else()
-    set(CUDA_SUCCESS "FALSE")
-  endif()
-else()
-  set(CUDA_SUCCESS "FALSE")
-  set(VASP_CUDA OFF)
+  set(VASP_CUDA ON)
 endif()
 
 if(VASP_CUDA)
@@ -248,7 +232,7 @@ if(VASP_CUDA)
 
   if(${CMAKE_CUDA_ARCHITECTURES} STREQUAL "native")
     message(STATUS "setting default CUDA compute capability of present device")
-    set(VASP_GPU_FLAG ${AUTO_CUDA_ARCH})
+    set(VASP_GPU_FLAG "-gpu=ccnative")
     message(STATUS "overwrite this by calling cmake with -DCMAKE_CUDA_ARCHITECTURES=XX")
   else()
     message(STATUS "setting user specified CUDA compute capability")
