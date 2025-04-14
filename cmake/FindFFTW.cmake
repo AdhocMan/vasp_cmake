@@ -31,13 +31,8 @@ macro(find_ffftw_component name lib_name lib_symbol)
       # Check for FFTW_ROOT environment variable
       if(DEFINED ENV{FFTW_ROOT} AND NOT "$ENV{FFTW_ROOT}" STREQUAL "")
         set(_FFTW_${name}_PATHS $ENV{FFTW_ROOT})
-      else()
-        # Default to LIBRARY_PATH if neither is set
-        set(_FFTW_${name}_PATHS ${CMAKE_LIBRARY_PATH_LIST})
       endif()
     endif()
-    set(_FFTW_${name}_INCLUDE_PATHS ${CMAKE_INCLUDE_PATH_LIST})
-
     set(_FFTW_${name}_DEFAULT_PATH_SWITCH)
 
     # check if FFTW is contained in BLAS library

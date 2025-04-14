@@ -113,23 +113,16 @@ include(cmake/sources_and_flags_options.cmake)
 
 set(VASP_EXTERNAL_LIBS)
 
-# Get the LIBRARY_PATH environment variable
+# Get the LIBRARY_PATH environment variable and convert it to a CMake list
 set(ENV_LIBRARY_PATH $ENV{LIBRARY_PATH})
-
-# Convert ENV_LIBRARY_PATH to a CMake list
-string(REPLACE ":" ";" CMAKE_LIBRARY_PATH_LIST "${ENV_LIBRARY_PATH}")
-
-# Append LIBRARY_PATH to CMAKE_PREFIX_PATH
-if(DEFINED ENV{LIBRARY_PATH})
-    list(APPEND CMAKE_PREFIX_PATH CMAKE_LIBRARY_PATH_LIST)
-
-    set(CMAKE_INCLUDE_PATH_LIST)
-    foreach(PATH ${CMAKE_LIBRARY_PATH_LIST})
-        get_filename_component(PARENT_DIR ${PATH} PATH)
-        list(APPEND CMAKE_INCLUDE_PATH_LIST ${PARENT_DIR})
-    endforeach()
-
-endif()
+string(REPLACE ":" ";" LIBRARY_PATH_LIST "${ENV_LIBRARY_PATH}")
+# Append LIBRARY_PATH to CMAKE_LIBRARY_PATH and CMAKE_PREFIX_PATH
+list(APPEND CMAKE_LIBRARY_PATH ${LIBRARY_PATH_LIST})
+foreach(PATH ${CMAKE_LIBRARY_PATH})
+  get_filename_component(PARENT_DIR ${PATH} PATH)
+  list(APPEND CMAKE_PREFIX_PATH ${PARENT_DIR})
+  list(APPEND CMAKE_INCLUDE_PATH ${PARENT_DIR}/include)
+endforeach()
 
 #-----------------------------
 # mandatory external libraries

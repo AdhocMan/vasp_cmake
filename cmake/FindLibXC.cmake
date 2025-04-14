@@ -23,7 +23,6 @@ set(_LibXC_PATHS)
 if(NOT POLICY CMP0074)
     set(_LibXC_PATHS ${LibXC_ROOT} $ENV{LibXC_ROOT})
 endif()
-list(APPEND _LibXC_PATHS ${CMAKE_LIBRARY_PATH_LIST})
 
 find_library(
     LibXC_LIBRARIES
