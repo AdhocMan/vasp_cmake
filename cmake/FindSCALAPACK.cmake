@@ -43,19 +43,12 @@ if(NOT SCALAPACK_LIBRARIES AND LAPACK_LIBRARIES MATCHES "mkl")
   endif()
 
   # now check if lapack is lp or ilp
-  if(LAPACK_LIBRARIES MATCHES "lp64")
-    set(SCALAPACK_MODE "lp64")
-  elseif(LAPACK_LIBRARIES MATCHES "ilp64")
-    set(SCALAPACK_MODE "ilp64")
-  endif()
-
-  # Use Intel MKL libraries for Scalapack and BLACS
-  if(${SCALAPACK_MODE} STREQUAL "lp64")
+  if(LAPACK_LIBRARIES MATCHES "ilp64")
+     set(MKL_SCALAPACK_NAMES mkl_scalapack_ilp64)
+    set(MKL_BLACS_MPI_NAMES mkl_blacs_${$MPI_MODE}_ilp64)
+  else()
     set(MKL_SCALAPACK_NAMES mkl_scalapack_lp64)
     set(MKL_BLACS_MPI_NAMES mkl_blacs_${MPI_MODE}_lp64)
-  elseif(${SCALAPACK_MODE} STREQUAL "ilp64")
-    set(MKL_SCALAPACK_NAMES mkl_scalapack_ilp64)
-    set(MKL_BLACS_MPI_NAMES mkl_blacs_${$MPI_MODE}_ilp64)
   endif()
 
   find_library(
